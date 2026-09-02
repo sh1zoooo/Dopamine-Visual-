@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: macos-14
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,6 +37,20 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             clean build 2>&1 | tee build.log
           tail -n 200 build.log
+
+      - name: Post build log on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -f build.log ]; then
+            jq -Rs '{body: ("Build log (tail):\n```\n" + .[-55000:] + "\n```")}' build.log > /tmp/comment.json
+          else
+            echo '{"body":"No build.log was produced."}' > /tmp/comment.json
+          fi
+          curl -s -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/commits/${{ github.sha }}/comments" \
+            -d @/tmp/comment.json
 
       - name: Package IPA
         run: |
