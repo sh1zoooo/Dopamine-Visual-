@@ -46,9 +46,13 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ -f build.log ]; then
-            { grep -n -E "error:|BUILD FAILED|fatal error|Undefined symbol|clang: error|xcodebuild: error" build.log || true; } > /tmp/errors.txt
-            echo "----- tail -----" >> /tmp/errors.txt
-            tail -n 100 build.log >> /tmp/errors.txt
+            awk '{ if (length($0) > 400) print substr($0,1,400) "...(cut)"; else print }' build.log > /tmp/build_trunc.log
+            {
+              echo "=== error/failure pattern matches ==="
+              grep -n -E "error:|Error:|ERROR|Undefined symbols|duplicate symbol|Multiple commands produce|PhaseScriptExecution|fatal error|clang: error|ld: |Command .*failed|No such file" /tmp/build_trunc.log || echo "(none)"
+              echo "=== context around BUILD FAILED ==="
+              grep -n -B 40 "BUILD FAILED" /tmp/build_trunc.log || true
+            } > /tmp/errors.txt
             jq -Rs '{body: ("Build errors:\n```\n" + .[-55000:] + "\n```")}' /tmp/errors.txt > /tmp/comment.json
           else
             echo '{"body":"No build.log was produced."}' > /tmp/comment.json
