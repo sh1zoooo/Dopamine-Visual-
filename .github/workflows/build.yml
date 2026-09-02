@@ -1,0 +1,57 @@
+name: Build Dopamine Visual (Fake) IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build .app (unsigned)
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project Dopamine.xcodeproj \
+            -scheme Dopamine \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            clean build | xcpretty || true
+
+      - name: Package IPA
+        run: |
+          APP_PATH="build/Build/Products/Release-iphoneos/Dopamine.app"
+          if [ ! -d "$APP_PATH" ]; then
+            echo "App bundle not found at $APP_PATH"
+            find build -maxdepth 6 -iname "*.app"
+            exit 1
+          fi
+          mkdir -p Payload
+          cp -r "$APP_PATH" Payload/Dopamine.app
+          # ad-hoc / fake-sign so eSign-style tools can re-sign it
+          /usr/bin/codesign --force --deep -s - Payload/Dopamine.app || true
+          zip -qr Dopamine-Visual-Fake.ipa Payload
+          rm -rf Payload
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Dopamine-Visual-Fake
+          path: Dopamine-Visual-Fake.ipa

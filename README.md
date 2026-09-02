@@ -1,9 +1,32 @@
-<img src="https://github.com/opa334/Dopamine/assets/52459150/ed04dd3e-d879-456d-9aa3-d4ed44819c7e" width="64" />
+# Dopamine Visual (Fake Edition)
 
-# Dopamine
+⚠️ **Это НЕ настоящий джейлбрейк.** Это шуточный клон интерфейса Dopamine
+для розыгрыша. Приложение только рисует UI (кнопки, анимации, фейковые
+логи вида "Bypassing PPL...", "Bypassing SPTM..." и т.п.) и не выполняет
+никаких реальных действий с системой, не эксплуатирует уязвимости и не
+изменяет iOS.
 
-A rootless semi-untethered jailbreak for iOS 15.0 - 17.3.1 (arm64e), iOS 15.0 - 18.7.1, 26.0 - 26.0.1 (A12/A13) and iOS 15.0 - 18.7.1 (arm64). More details will follow here soon.
+## Сборка
 
-Please note that all issues related to version support will be deleted without response.
+Проект собирается через [XcodeGen](https://github.com/yonaskolb/XcodeGen)
+и GitHub Actions (`.github/workflows/build.yml`) на macOS-раннере:
 
-Official website / download: https://ellekit.space/dopamine/
+```
+xcodegen generate
+xcodebuild -project Dopamine.xcodeproj -scheme Dopamine -sdk iphoneos ...
+```
+
+Готовый `.ipa` появится в артефактах запуска Action.
+
+## Что было убрано из оригинального Dopamine
+
+Из исходников полностью удалены:
+- `BaseBin` (весь бинарный компонент джейлбрейка);
+- `Exploits/*`, `Jailbreak/DOJailbreaker*`, `DOExploit*`, `DOBootstrapper*`,
+  `DOEnvironmentManager` — всё, что реально патчит/эксплуатирует систему;
+- `libgrabkernel2.a`, `libpartial.a` и любые бинарные зависимости эксплойтов;
+- приватные entitlements (no-sandbox, TCC allow, mobileinstall SPI и т.д.).
+
+Оставлен только UI-слой, дополненный фейковым классом
+`Jailbreak/DOFakeEnvironment`, который просто анимирует "прогресс" через
+таймеры — реального выполнения кода/патчинга не происходит.
