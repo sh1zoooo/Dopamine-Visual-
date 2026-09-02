@@ -45,5 +45,5 @@ targets:
           - "$(PROJECT_DIR)/Frameworks/Preferences.framework/Headers"
         OTHER_LDFLAGS:
           - "-F$(PROJECT_DIR)/Frameworks"
-          - "-framework"
+          - "-weak_framework"
           - "Preferences"
