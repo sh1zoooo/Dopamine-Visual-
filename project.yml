@@ -20,34 +20,6 @@ targets:
     deploymentTarget: "15.0"
     sources:
       - path: Dopamine
-    resources:
-      - path: Dopamine/Assets.xcassets
-      - path: Dopamine/Base.lproj
-      - path: Dopamine/Resources
-      - path: Dopamine/en.lproj
-      - path: Dopamine/ru.lproj
-      - path: Dopamine/de.lproj
-      - path: Dopamine/fr.lproj
-      - path: Dopamine/it.lproj
-      - path: Dopamine/ja.lproj
-      - path: Dopamine/ko.lproj
-      - path: Dopamine/nl.lproj
-      - path: Dopamine/pl.lproj
-      - path: Dopamine/pt-BR.lproj
-      - path: Dopamine/da.lproj
-      - path: Dopamine/el.lproj
-      - path: Dopamine/es.lproj
-      - path: Dopamine/fil.lproj
-      - path: Dopamine/kk.lproj
-      - path: Dopamine/th.lproj
-      - path: Dopamine/tr.lproj
-      - path: Dopamine/uk.lproj
-      - path: Dopamine/ur.lproj
-      - path: Dopamine/vi.lproj
-      - path: Dopamine/zh-CN.lproj
-      - path: Dopamine/zh-HK.lproj
-      - path: Dopamine/zh-Hans.lproj
-      - path: Dopamine/zh-TW.lproj
     info:
       path: Dopamine/Info.plist
       properties:
